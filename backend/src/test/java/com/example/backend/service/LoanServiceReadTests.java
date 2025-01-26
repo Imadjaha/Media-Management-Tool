@@ -60,6 +60,11 @@ class LoanServiceReadTests {
     SecurityContextHolder.setContext(context);
   }
 
+  /**
+ * Testet das Abrufen der Leihvorgänge für den eingeloggten Benutzer.
+ * Zu erwarten:Liste von Leihvorgängen zurückgegeben, wenn der Benutzer existiert
+ * und mindestens eine zugeordnete Person mit Leihvorgängen vorhanden ist.
+ */
   @Test
   void testGetLoansByUser_shouldReturnListOfLoansForLoggedInUser() {
     String username = "testuser";
@@ -90,6 +95,11 @@ class LoanServiceReadTests {
     assertTrue(result.contains(loan2));
   }
 
+
+/**
+ * Testet das Abrufen der Leihvorgänge für den eingeloggten Benutzer, wenn der Benutzer nicht gefunden wird.
+ * Zu erwarten: `NoSuchElementException` geworfen, wenn der Benutzer nicht existiert.
+ */
   @Test
   void testGetLoansByUser_whenUserNotFound_shouldThrowException() {
     String username = "testuser";
@@ -109,6 +119,10 @@ class LoanServiceReadTests {
     assertEquals("No value present", exception.getMessage()); // Erwartete Nachricht von NoSuchElementException
   }
 
+  /**
+ * Testet das Abrufen der Leihvorgänge für den eingeloggten Benutzer, wenn keine Personen für den Benutzer gefunden werden.
+ * Zu erwarten: Leere Liste zurückgegeben, wenn keine Personen mit Leihvorgängen für den Benutzer existieren.
+ */
   @Test
   void testGetLoansByUser_whenNoPersonsFound_shouldReturnEmptyList() {
     String username = "testuser";
@@ -134,6 +148,11 @@ class LoanServiceReadTests {
     verify(personRepository).findByUserUserId(userEntity.getUserId());
   }
 
+
+/**
+ * Testet das Abrufen der aktiven Leihvorgänge für den eingeloggten Benutzer.
+ * Zu erwarten: Eine Liste mit nur den aktiven Leihvorgängen zurückgegeben wird (Leihvorgänge, die nicht zurückgegeben wurden).
+ */
   @Test
   void testGetActiveLoansByUser_shouldReturnActiveLoans() {
     String username = "testuser";
@@ -154,6 +173,10 @@ class LoanServiceReadTests {
     assertEquals(activeLoan, result.get(0));
   }
 
+  /**
+ * Testet das Abrufen der aktiven Leihvorgänge für den eingeloggten Benutzer, wenn der Benutzer nicht gefunden wird.
+ * Zu erwarten:`UsernameNotFoundException` geworfen, wenn der Benutzer mit dem angegebenen Benutzernamen nicht existiert.
+ */
   @Test
   void testGetActiveLoansByUser_whenUserNotFound_shouldThrowUsernameNotFoundException() {
     String username = "testuser";
@@ -177,6 +200,11 @@ class LoanServiceReadTests {
     verify(userRepository).findByUsername(username);
   }
 
+  /**
+ * Testet das Abrufen der überfälligen Leihvorgänge für den eingeloggten Benutzer.
+ * Zu erwarten: Liste der überfälligen Leihvorgänge zurückgegeben, wenn die Leihvorgänge das Rückgabedatum überschritten haben 
+ * und nicht zurückgegeben wurden.
+ */
   @Test
   void testGetOverdueLoansByUser_shouldReturnOverdueLoans() {
     String username = "testuser";
@@ -205,6 +233,10 @@ class LoanServiceReadTests {
     assertEquals(overdueLoan, overdueLoans.get(0));
   }
 
+  /**
+ * Testet das Abrufen der überfälligen Leihvorgänge für den eingeloggten Benutzer, wenn der Benutzer nicht gefunden wird.
+ * Zu erwarten: `UsernameNotFoundException` geworfen, wenn der Benutzer mit dem angegebenen Benutzernamen nicht existiert.
+ */
   @Test
   void testGetOverdueLoansByUser_whenUserNotFound_shouldThrowUsernameNotFoundException() {
     String username = "testuser";

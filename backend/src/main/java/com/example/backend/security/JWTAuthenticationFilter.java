@@ -14,12 +14,25 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Filter zur Bearbeitung von JWT-Authentifizierung.
+ * Überprüft die Anforderung auf JWT und authentifiziert
+ * den Benutzer, wenn das Token gültig ist.
+ */
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
   private final JWTGenerator tokenGenerator;
 
   private final CustomUserDetailsService customUserDetailsService;
 
+    /**
+   * Konstruktor für die Initialisierung des Filters.
+   * 
+   * @param tokenGenerator JWT-Generator, der zur Validierung
+   * und Extraktion von Informationen ausTokens verwendet wird.
+   * @param customUserDetailsService benutzerdefinierte Service, der
+   * Benutzerinformationen anbahnd des Benutzernamen lädt.
+   */
   public JWTAuthenticationFilter(
     JWTGenerator tokenGenerator,
     CustomUserDetailsService customUserDetailsService
@@ -28,6 +41,17 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     this.customUserDetailsService = customUserDetailsService;
   }
 
+  /**
+   * Überprüft JWT-Token und authentifiziert den Benutzer, falls der
+   * Token gültig ist.
+   * 
+   * @param request Eingehende HTTP-Anforderung.
+   * @param response HTTP-Antwort.
+   * @param filterChain Filterkette, die nach dem Filter fortgesetzt wird.
+   * @throws ServletException Wenn eine Fehlerbedingung während der Filterung auftritt.
+   * @throws IOException Wenn ein Fehler beim Lesen der Anforderung oder
+   * Schreiben der Antwort auftritt.
+   */
   @Override
   protected void doFilterInternal(
     HttpServletRequest request,
@@ -55,11 +79,18 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
+  /**
+   * Extrahiert JWT aus dem "Authorization"-Header der HTTP-Anforderung.
+   * 
+   * @param request Eingehende HTTP-Anforderung.
+   * @return JWT, das aus dem Header extrahiert wurde, oder {@code null},
+   * wenn kein Token gefunden wurde.
+   */
   private String getJWTFromRequest(HttpServletRequest request) {
     String bearerToken = request.getHeader("Authorization");
     if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7, bearerToken.length());
-      // from 7 because "Bearer " is 7 characters and we wanna get only the token
+      // ab 7 da "Bearer " sieben Zeichen hat und wir nur  den Token haben wollen.
     }
     return null;
   }

@@ -25,6 +25,11 @@ import com.example.backend.repository.MediaRepository;
 import com.example.backend.repository.PersonRepository;
 import com.example.backend.repository.UserRepository;
 
+
+/**
+ * Für erwaltung von Ausleihen. Enthält Methoden zum Erstellen von Ausleihen, Abfragen
+ * von Ausleihen und Markieren von Medien als zurückgegeben.
+ */
 @Service
 public class LoanService {
 
@@ -38,6 +43,16 @@ public class LoanService {
   private final UserRepository userRepository;
   private final PersonRepository personRepository;
 
+   /**
+   * Konstruktor  {@link LoanService}.
+   * @param loanRepository Repository für Ausleihen.
+   * @param userService Service für Benutzer.
+   * @param mediaService Service für Medien.
+   * @param mediaRepository Repository für Medien.
+   * @param personService Service für Personen.
+   * @param personRepository Repository für Personen.
+   * @param userRepository Repository für Benutzer.
+   */
   public LoanService(
     LoanRepository loanRepository,
     UserService userService,
@@ -56,6 +71,10 @@ public class LoanService {
     this.userRepository = userRepository;
   }
 
+   /**
+   * Gibt alle Ausleihen für den aktuellen Benutzer zurück.
+   * @return Liste der Ausleihen für den aktuellen Benutzer.
+   */
   public List<LoanEntity> getLoansByUser() {
     String username = SecurityContextHolder
       .getContext()
@@ -72,6 +91,12 @@ public class LoanService {
     return loanRepository.findByPersons(persons);
   }
 
+
+  /**
+   * Gibt alle aktiven Ausleihen, die noch nicht zurückgegeben worden sind,
+   * für den aktuellen Benutzer zurück.
+   * @return Liste der aktiven Ausleihen für den aktuellen Benutzer.
+   */
   public List<LoanEntity> getActiveLoansByUser() {
     String username = SecurityContextHolder
       .getContext()
@@ -89,7 +114,12 @@ public class LoanService {
       user.get().getUserId()
     );
   }
-
+  
+  /**
+   * Gibt alle überfälligen Ausleihen für den aktuellen Benutzer zurück.
+   * @param currentDate Aktuelles Datum.
+   * @return Liste der überfälligen Ausleihen für den aktuellen Benutzer.
+   */
   public List<LoanEntity> getOverdueLoansByUser(LocalDate currentDate) {
     String username = SecurityContextHolder
       .getContext()
@@ -109,6 +139,16 @@ public class LoanService {
     );
   }
 
+    /**
+   * Erstellt neue Ausleihe für ein Medium und eine Person.
+   *
+   * @param mediaId ID des Mediums.
+   * @param personId ID der Person, die das Medium ausleiht.
+   * @param authentication Authentifizierungsobjekt des aktuellen Benutzers.
+   * @param dueDate Fälligkeitsdatum der Ausleihe.
+   * @param borrowedAt  Datum und die Uhrzeit, an dem das Medium ausgeliehen wurde.
+   * @return Erstellte {@link LoanEntity}-Objekt.
+   */
   public LoanEntity createLoan(
     Long mediaId,
     Long personId,
@@ -161,6 +201,11 @@ public class LoanService {
     return savedLoan;
   }
 
+    /**
+   * Markiert Ausleihe als "zurückgegeben" und aktualisiert Medienstatus.
+   * @param loanId ID der Ausleihe, die als zurückgegeben markiert werden soll.
+   * @param returnedAt Datum und Uhrzeit der Rückgabe des Mediums.
+   */
   public void markAsReturned(Long loanId, LocalDateTime returnedAt) {
     if (loanId == null) {
       throw new IllegalArgumentException("Loan ID cannot be null");

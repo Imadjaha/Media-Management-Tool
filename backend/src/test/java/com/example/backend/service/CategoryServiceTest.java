@@ -42,7 +42,10 @@ class CategoryServiceTest {
   void setUp() {
     MockitoAnnotations.openMocks(this);
   }
-
+/**
+ * Testet das erfolgreiche Erstellen einer Kategorie.
+ * Zu erwarten: Kategorie korrekt erstellt und die richtigen Werte zurückgegeben.
+ */
   @Test
   void testCreateCategory_Success() {
     CategoryDTO categoryDTO = new CategoryDTO();
@@ -73,6 +76,11 @@ class CategoryServiceTest {
     verify(categoryRepository, times(1)).save(any(CategoryEntity.class));
   }
 
+
+/**
+ * Testet das Erstellen einer Kategorie, wenn der Benutzer nicht gefunden wird.
+ * Zu erwarten: IllegalArgumentException geworfen, wenn der Benutzer nicht existiert.
+ */
   @Test
   void testCreateCategory_UserNotFound_ShouldThrowException() {
     CategoryDTO categoryDTO = new CategoryDTO();
@@ -88,6 +96,10 @@ class CategoryServiceTest {
     );
   }
 
+  /**
+ * Testet das erfolgreiche Aktualisieren einer Kategorie.
+ * Zu erwarten: Name der Kategorie erfolgreich aktualisiert.
+ */
   @Test
   void testUpdateCategory_Success() {
     Long categoryId = 1L;
@@ -113,6 +125,10 @@ class CategoryServiceTest {
     verify(categoryRepository, times(1)).save(existingCategory);
   }
 
+  /**
+ * Testet das Aktualisieren einer Kategorie, wenn die Kategorie nicht gefunden wird.
+ * Zu erwarten: RuntimeException geworfen, wenn die Kategorie nicht existiert.
+ */
   @Test
   void testUpdateCategory_NotFound_ShouldThrowRuntimeException() {
     Long categoryId = 1L;
@@ -127,6 +143,11 @@ class CategoryServiceTest {
     );
   }
 
+
+/**
+ * Testet das erfolgreiche Löschen einer Kategorie.
+ * Zu erwarten: Kategorie ohne Fehler gelöscht.
+ */
   @Test
   void testDeleteCategory_Success() {
     Long categoryId = 1L;
@@ -138,6 +159,10 @@ class CategoryServiceTest {
     verify(categoryRepository, times(1)).deleteById(categoryId);
   }
 
+  /**
+ * Testet das Abrufen von Kategorie-Datenübertragungsobjekten (DTOs) anhand des Benutzernamens.
+ * Zu erwarten: Kategorie-Datenübertragungsobjekte korrekt zurückgegeben.
+ */
   @Test
   void testGetCategoryDTOsByUsername_Success() {
     String username = "testUser";

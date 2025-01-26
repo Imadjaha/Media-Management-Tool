@@ -6,6 +6,10 @@ import java.util.List;
 
 import lombok.Data;
 
+/**
+ * Data Transfer Object, für die Darstellung eines Medium mit den zugehörigen Kategorien.
+ * Verwendet, um Informationen über ein Medium und dessen Kategorien an die API-Benutzer zu übertragen.
+ */
 @Data
 public class MediaWithCategoriesDTO {
 
@@ -22,10 +26,17 @@ public class MediaWithCategoriesDTO {
   private Boolean isFavorite;
   private LocalDateTime createdAt;
 
+  /** Eine Liste von Kategorien, die dem Medium zugeordnet sind. */
   private List<CategoryDTO> categories = new ArrayList<>();
 
   public MediaWithCategoriesDTO() {}
 
+  /**
+   * Konstruktor, der ein {@link MediaCreationDTO} als Eingabe verwendet.
+   * Übernimmt die Felder aus dem MediaCreationDTO und erstellt eine neue Instanz von MediaWithCategoriesDTO.
+   *
+   * @param media MediaCreationDTO mit Basisinformationen.
+   */
   public MediaWithCategoriesDTO(MediaCreationDTO media) {
     this.producer = media.getProducer();
     this.title = media.getTitle();
@@ -38,6 +49,13 @@ public class MediaWithCategoriesDTO {
     this.createdAt = media.getCreatedAt();
   }
 
+  /**
+   * Methode erstellt MediaWithCategoriesDTO-Objekt aus einer {@link MediaWithCategoriesProjection}.
+   * Sie verarbeitet die Kategorien und erstellt entsprechende {@link CategoryDTO}-Instanzen.
+   *
+   * @param projection Projektion mit den Medien- und Kategoriedaten.
+   * @return Vollständig initialisiertes MediaWithCategoriesDTO-Objekt.
+   */
   public static MediaWithCategoriesDTO fromProjection(
     MediaWithCategoriesProjection projection
   ) {

@@ -41,6 +41,10 @@ public class UserServiceTest {
     user.setEmail("testEmail");
   }
 
+  /**
+   * Testet das Abrufen eines Benutzers anhand des Benutzernamens.
+   * Überprüft, dass der Benutzer korrekt zurückgegeben wird, wenn er in der Datenbank vorhanden ist.
+   */
   @Test
   public Optional<UserEntity> testGetUserByUsername() {
     when(userRepository.findByUsername("testUser"))
@@ -50,6 +54,10 @@ public class UserServiceTest {
     return foundUser;
   }
 
+  /**
+   * Testet das erfolgreiche Aktualisieren eines Benutzers.
+   * Überprüft, dass die Benutzerdaten korrekt aktualisiert werden.
+   */
   @Test
   public void testUpdateUserSuccess() {
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -63,6 +71,10 @@ public class UserServiceTest {
     verify(userRepository, times(1)).save(user);
   }
 
+   /**
+   * Testet das Löschen eines Benutzers.
+   * Überprüft, dass der Benutzer aus der Datenbank gelöscht wird.
+   */
   @Test
   public void testDeleteUser() {
     doNothing().when(userRepository).deleteById(1L);
@@ -72,6 +84,10 @@ public class UserServiceTest {
     verify(userRepository, times(1)).deleteById(1L);
   }
 
+  /**
+   * Testet das Abrufen von Benutzern, wenn es fünf oder weniger Benutzer in der Datenbank gibt.
+   * Überprüft, ob alle Benutzer korrekt zurückgegeben werden, wenn die Anzahl der Benutzer 5 oder weniger beträgt.
+   */
   @Test
   public void testGetUsersIfFiveOrLess_success() {
     List<UserEntity> expectedUsers = new ArrayList<>();
@@ -88,6 +104,10 @@ public class UserServiceTest {
     assertEquals(expectedUsers, actualUsers);
   }
 
+  /**
+   * Testet das Abrufen von Benutzern, wenn es mehr als fünf Benutzer in der Datenbank gibt.
+   * Überprüft, dass eine leere Liste zurückgegeben wird, wenn mehr als fünf Benutzer in der Datenbank existieren.
+   */
   @Test
   public void testGetUsersIfMoreThanFive() {
     List<UserEntity> expectedUsers = new ArrayList<>();

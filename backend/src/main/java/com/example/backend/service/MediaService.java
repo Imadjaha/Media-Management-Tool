@@ -33,6 +33,13 @@ public class MediaService {
   @Autowired
   private final UserService userService;
 
+  /**
+   * Konstruktor, um Abhängigkeiten des MediaService zu initialisieren.
+   * @param mediaRepository Repository für Medien-Entitäten
+   * @param userService Service für Benutzer-bezogene Operationen
+   * @param categoryRepository Repository für Kategorie-Entitäten
+   * @param mediaCategoryRepository Repository für Medien-Kategorie-Verknüpfungen
+   */
   public MediaService(
     MediaRepository mediaRepository,
     UserService userService,
@@ -45,6 +52,11 @@ public class MediaService {
     this.mediaCategoryRepository = mediaCategoryRepository;
   }
 
+  /**
+   * Ruft Medien eines Benutzers anhand des Benutzernamens ab mit der zugehörigen Kategorien.
+   * @param username Benutzername des Benutzers, dessen Medien abgerufen werden sollen.
+   * @return Liste von MediaWithCategoriesDTO, die Medien mit den zugehörigen Kategorien darstellen.
+   */
   public List<MediaWithCategoriesDTO> getAllMediaByUsernameWithCategories(
     String username
   ) {
@@ -67,10 +79,19 @@ public class MediaService {
     return dtos;
   }
 
+  /**
+   * Ruft alle Medien ab.
+   * @return Liste aller Medien
+   */
   public List<MediaEntity> getAllMedia() {
     return mediaRepository.findAll();
   }
 
+    /**
+   * Ruft Medien eines Benutzers anhand seines Benutzernamens ab.
+   * @param username Benutzername des Benutzers, dessen Medien abgerufen werden sollen.
+   * @return Liste von Medien, die diesem Benutzer gehören.
+   */
   public List<MediaEntity> getAllMediaByUsername(String username) {
     Optional<UserEntity> userOptional = userService.getUserByUsername(username);
     if (userOptional.isEmpty()) {
@@ -80,14 +101,28 @@ public class MediaService {
     return mediaRepository.findByUserUserId(user.getUserId());
   }
 
+  /**
+   * Ruft Medienentität anhand ihrer ID ab.
+   * @param mediaId ID des abzurufenden Mediums
+   * @return Optional mit der Medienentität, falls gefunden, sonst leer.
+   */
   public Optional<MediaEntity> getMediaById(Long mediaId) {
     return mediaRepository.findById(mediaId);
   }
 
+  /**
+   * Ruft alle Medien eines Benutzers anhand seiner Benutzer-ID ab.
+   * @param userId ID des Benutzers, dessen Medien abgerufen werden sollen.
+   * @return Liste von Medien, die diesem Benutzer gehören.
+   */
   public List<MediaEntity> getMediaByUserId(Long userId) {
     return mediaRepository.findByUserUserId(userId);
   }
 
+    /**
+   * Erzeugt Testmedien für einen Benutzer mit der ID "12345".
+   * @param count Anzahl der zu erstellenden Testmedien.
+   */
   public void seedMedia(int count) {
     UserEntity user = userService
       .getUserByUsername("12345")
@@ -105,6 +140,13 @@ public class MediaService {
     }
   }
 
+    /**
+   * Setzt Medium als Favorit für den aktuellen Benutzer.
+   * @param mediaId ID des Mediums, das als Favorit markiert werden soll.
+   * @param modifyMedia Medium, das die zu ändernde Favoriten-Eigenschaft enthält.
+   * @param authentication  Authentifizierungsinformationen des aktuellen Benutzers.
+   * @return DTO des aktualisierten Mediums mit den zugehörigen Kategorien.
+   */
   public MediaWithCategoriesDTO addToFavorite(
     Long mediaId,
     MediaEntity modifyMedia,
@@ -123,19 +165,19 @@ public class MediaService {
       .findById(mediaId)
       .orElseThrow(() -> new RuntimeException("Media not found"));
 
-    // Ensure the media belongs to the current user (optional access check)
+    // Überprüfen, ob das Medium dem aktuellen Benutzer gehört (optional)
     if (!currentMedia.getUser().getUserId().equals(user.getUserId())) {
       throw new RuntimeException(
         "You don't have permission to modify this media."
       );
     }
 
-    // Update isFavorite based on the incoming 'modifyMedia'
+    // Setzt den Favoritenstatus basierend auf dem eingehenden 'modifyMedia'
     currentMedia.setIsFavorite(modifyMedia.getIsFavorite());
 
     currentMedia = mediaRepository.save(currentMedia);
 
-    // Now build a MediaWithCategoriesDTO from 'currentMedia'
+    // Bauen des MediaWithCategoriesDTO aus dem 'currentMedia'
     MediaWithCategoriesDTO dto = new MediaWithCategoriesDTO();
     dto.setMediaId(currentMedia.getMediaId());
     dto.setUserId(user.getUserId());
@@ -149,7 +191,7 @@ public class MediaService {
     dto.setIsFavorite(currentMedia.getIsFavorite());
     dto.setCreatedAt(currentMedia.getCreatedAt());
 
-    // Convert each linked MediaCategory -> CategoryDTO
+    // Konvertieren von jeder verknüpften MediaCategory -> CategoryDTO
     if (currentMedia.getMediaCategories() != null) {
       currentMedia
         .getMediaCategories()
@@ -167,22 +209,46 @@ public class MediaService {
     return dto;
   }
 
+    /**
+   * Ruft Medien eines bestimmten Medienstatus ab.
+   * @param mediaState Medienstatus, nach dem gefiltert werden soll.
+   * @return Liste von Medien mit dem angegebenen Status
+   */
   public List<MediaEntity> getMediaByMediaState(MediaState mediaState) {
     return mediaRepository.findByMediaState(mediaState);
   }
 
+    /**
+   * Ruft Medien eines bestimmten Typs ab.
+   * @param type Medientyp, nach dem gefiltert werden soll.
+   * @return Liste von Medien des angegebenen Typs.
+   */
   public List<MediaEntity> getMediaByType(MediaType type) {
     return mediaRepository.findByType(type);
   }
 
+
+  /**
+   * @return Eine Liste von Medien, die als Favoriten markiert wurden.
+   */
   public List<MediaEntity> getFavoriteMedia() {
     return mediaRepository.findByIsFavorite(true);
   }
 
+   /**
+   * @param isbn  ISBN des Mediums
+   * @return Optional mit der Medienentität, wenn gefunden, sonst leer.
+   */
   public Optional<MediaEntity> getMediaByIsbn(String isbn) {
     return mediaRepository.findByIsbn(isbn);
   }
 
+   /**
+   * Erstellt neues Medium für den aktuellen Benutzer.
+   * @param media Medientypen und Informationen zur Erstellung eines neuen Mediums.
+   * @param authentication Authentifizierungsinformationen des Benutzers.
+   * @return Erstelltes Medium als DTO.
+   */
   public MediaWithCategoriesDTO createMedia(
     MediaCreationDTO media,
     Authentication authentication
@@ -204,12 +270,12 @@ public class MediaService {
     mediaEntity.setIsFavorite(media.getIsFavorite());
     mediaEntity.setCreatedAt(LocalDateTime.now());
 
-    // We'll build the return DTO from the MediaCreationDTO
+    // Bauen vom DTO aus MediaCreationDTO
     MediaWithCategoriesDTO mediaWithCategoriesDTO = new MediaWithCategoriesDTO(
       media
     );
 
-    // For each category ID in the request, find the actual CategoryEntity
+    // Für jede Kategoriewahl in der Anfrage, finden wir die Kategorie
     for (Long categoryId : media.getCategories()) {
       CategoryEntity categoryEntity = categoryRepository
         .findById(categoryId)
@@ -220,7 +286,7 @@ public class MediaService {
       mediaCategory.setCategory(categoryEntity);
       mediaEntity.getMediaCategories().add(mediaCategory);
 
-      // Also add a CategoryDTO to the return object
+      // Auch eine CategoryDTO zum Rückgabewert hinzufügen
       CategoryDTO catDTO = new CategoryDTO();
       catDTO.setCategoryId(categoryEntity.getCategoryId());
       catDTO.setCategoryName(categoryEntity.getCategoryName());
@@ -235,6 +301,15 @@ public class MediaService {
     return mediaWithCategoriesDTO;
   }
 
+    /**
+   * Aktualisiert bestehendes Medium mit den neuen Daten.
+   *
+   * @param mediaId ID des zu aktualisierenden Mediums.
+   * @param currentMedia DTO mit neuen Medieninformationen.
+   * @param authentication Authentifizierungsinformationen des aktuellen Benutzers.
+   * @return Aktualisierte Medium als Entity.
+   * @throws RuntimeException Wenn der Benutzer das Medium nicht besitzt oder das Medium /die Kategorie nicht gefunden wurde.
+   */
   public MediaEntity updateMedia(
     Long mediaId,
     MediaCreationDTO currentMedia,
@@ -249,7 +324,7 @@ public class MediaService {
       .findById(mediaId)
       .orElseThrow(() -> new RuntimeException("Media not found"));
 
-    // Make sure the media belongs to this user (optional check)
+    // Sicherstellen, dass das Medium dem aktuellen Benutzer gehört (optional)
     if (!mediaToUpdate.getUser().getUserId().equals(user.getUserId())) {
       throw new RuntimeException(
         "You don't have permission to update this media."
@@ -267,7 +342,7 @@ public class MediaService {
     mediaToUpdate.setIsbn(currentMedia.getIsbn());
     mediaToUpdate.setIsFavorite(currentMedia.getIsFavorite());
 
-    // --- Clear existing categories & reassign from request ---
+    // Bestehende Kategorien entfernen und aus der Anfrage neu zuordnen
     mediaToUpdate.getMediaCategories().clear();
 
     if (currentMedia.getCategories() != null) {
@@ -291,6 +366,16 @@ public class MediaService {
     return mediaRepository.save(mediaToUpdate);
   }
 
+    /**
+   * Weist Medium eine neue Kategorie zu.
+   *
+   * @param mediaId ID des Mediums.
+   * @param categoryId ID der hinzuzufügenden Kategorie.
+   * @param authentication Authentifizierungsinformationen des aktuellen Benutzers.
+   * @return Aktualisierte Medium mit hinzugefügten Kategorie.
+   * @throws RuntimeException Wenn das Medium oder die Kategorie nicht gefunden wird, 
+   * oder der Benutzer nicht berechtigt ist, Sachen zu ändern.
+   */
   public MediaEntity assignCategoryToMedia(
     Long mediaId,
     Long categoryId,
@@ -304,7 +389,7 @@ public class MediaService {
         new IllegalArgumentException("Media not found with ID: " + mediaId)
       );
 
-    // Ensure user owns the media (optional check)
+     // Sicherstellen, dass der Benutzer das Medium besitzt
     if (!media.getUser().getUsername().equals(userName)) {
       throw new RuntimeException("You don't own this media.");
     }
@@ -316,13 +401,12 @@ public class MediaService {
         new IllegalArgumentException("Category not found or not owned by user.")
       );
 
-    // Check if already exists
+    // Überprüfen, ob die Kategorie bereits zugeordnet ist
     boolean exists = mediaCategoryRepository.existsByMediaMediaIdAndCategoryCategoryId(
       mediaId,
       categoryId
     );
     if (exists) {
-      // we can throw or silently skip
       throw new IllegalArgumentException("Category is already assigned.");
     }
 
@@ -333,12 +417,20 @@ public class MediaService {
 
     mediaCategoryRepository.save(mediaCategory);
 
-    // Return the updated media. Optionally, re-fetch if you need the updated associations
+    // Rückgabe des aktualisierten Mediums
     return mediaRepository
       .findById(mediaId)
       .orElseThrow(() -> new RuntimeException("Error fetching updated media."));
   }
 
+  /**
+   * Entfernt Kategorie von einem Medium.
+   *
+   * @param mediaId ID des Mediums.
+   * @param categoryId ID der zu entfernenden Kategorie.
+   * @param authentication Authentifizierungsinformationen des aktuellen Benutzers.
+   * @throws IllegalArgumentException Wenn das Medium oder die Kategorie nicht gefunden werden oder der Benutzer nicht berechtigt ist.
+   */
   public void removeCategoryFromMedia(
     Long mediaId,
     Long categoryId,
@@ -376,6 +468,11 @@ public class MediaService {
     mediaCategoryRepository.delete(mediaCategory);
   }
 
+  /**
+   * Löscht Medium anhand seiner ID.
+   * @param mediaId ID des zu löschenden Mediums.
+   * @throws RuntimeException Wenn das Medium nicht gefunden wird.
+   */
   public void deleteMedia(Long mediaId) {
     mediaRepository.deleteById(mediaId);
   }

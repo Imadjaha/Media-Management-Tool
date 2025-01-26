@@ -22,6 +22,10 @@ import com.example.backend.model.UserEntity;
 import com.example.backend.service.MediaService;
 import com.example.backend.service.UserService;
 
+/**
+ * REST-Controller zur Verwaltung von Medien.
+ * Stellt Möglichkeiten für CRUD-Operationen (Erstellen, Lesen, Aktualisieren, Löschen) zur Verfügung.
+ */
 @RestController
 @RequestMapping("/api/media")
 public class MediaController {
@@ -31,16 +35,33 @@ public class MediaController {
   @Autowired
   private UserService userService;
 
+  /**
+   * Konstruktor {@code MediaController}.
+   * 
+   * @param mediaService Implementierung der Logik für Medien.
+   */
   public MediaController(MediaService mediaService) {
     this.mediaService = mediaService;
   }
 
+  /**
+   * Seed-Methode zum Hinzufügen von Testdatensätzen für Medien.
+   * Erstellt bestimmte Anzahl von Testdatensätzen in der Datenbank.
+   * 
+   * @return Erfolgsmeldung als String.
+   */
   @GetMapping("/seed-media")
   public String loadTestMedia() {
     mediaService.seedMedia(2000);
     return "Seeded 1000 Media records.";
   }
 
+  /**
+   * Gibt alle Medien eines Benutzers mit zugehörigen Kategorien zurück.
+   * 
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   * @return Eine Liste von {@link MediaWithCategoriesDTO}.
+   */
   @GetMapping("/by-username")
   public List<MediaWithCategoriesDTO> getAllMediaByUsernameTest(
     Authentication authentication
@@ -49,6 +70,13 @@ public class MediaController {
     return mediaService.getAllMediaByUsernameWithCategories(username);
   }
 
+   /**
+   * Erstellt neues Medium und verknüpft es mit einem Benutzer.
+   * 
+   * @param media Zu erstellenden Mediendaten als {@link MediaCreationDTO}.
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   * @return Erstelltes Medium mit Kategorien als {@link MediaWithCategoriesDTO}.
+   */
   @PostMapping
   public MediaWithCategoriesDTO createMedia(
     @RequestBody MediaCreationDTO media,
@@ -57,6 +85,14 @@ public class MediaController {
     return mediaService.createMedia(media, authentication);
   }
 
+  /**
+   * Aktualisiert Informationen eines Mediums.
+   * 
+   * @param mediaId ID des zu aktualisierenden Mediums.
+   * @param dto Neuen Daten als {@link MediaCreationDTO}.
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   * @return Das aktualisierte {@link MediaEntity}.
+   */
   @PutMapping("/{mediaId}")
   public MediaEntity updateMedia(
     @PathVariable Long mediaId,
@@ -66,6 +102,14 @@ public class MediaController {
     return mediaService.updateMedia(mediaId, dto, authentication);
   }
 
+  /**
+   * Fügt Medium zur Favoritenliste des Benutzers hinzu.
+   * 
+   * @param mediaId ID des Mediums, das als Favorit markiert werden soll.
+   * @param add Informationen des Mediums.
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   * @return Aktualisierte Medium mit Kategorien als {@link MediaWithCategoriesDTO}.
+   */
   @PutMapping("/{mediaId}/favorite")
   public ResponseEntity<MediaWithCategoriesDTO> addFavorite(
     @PathVariable Long mediaId,
@@ -90,6 +134,14 @@ public class MediaController {
     return ResponseEntity.ok(updatedFavorite);
   }
 
+  /**
+   * Verknüpft Kategorie mit einem Medium.
+   * 
+   * @param mediaId ID des Mediums, dem die Kategorie hinzugefügt werden soll.
+   * @param categoryId ID der hinzuzufügenden Kategorie.
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   * @return Das aktualisierte {@link MediaEntity}.
+   */
   @PostMapping("/{mediaId}/assign-category/{categoryId}")
   public MediaEntity assignCategoryToMedia(
     @PathVariable Long mediaId,
@@ -103,6 +155,13 @@ public class MediaController {
     );
   }
 
+  /**
+   * Entfernt Kategorie von einem Medium.
+   * 
+   * @param mediaId ID des Mediums, von dem die Kategorie entfernt werden soll.
+   * @param categoryId ID der zu entfernenden Kategorie.
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   */
   @DeleteMapping("/{mediaId}/remove-category/{categoryId}")
   public void removeCategoryFromMedia(
     @PathVariable Long mediaId,
@@ -112,6 +171,12 @@ public class MediaController {
     mediaService.removeCategoryFromMedia(mediaId, categoryId, authentication);
   }
 
+  /**
+   * Löscht Medium basierend auf seiner ID.
+   * 
+   * @param id ID des zu löschenden Mediums.
+   * @return Eine leere {@link ResponseEntity} mit dem HTTP-Status "204 No Content".
+   */
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteMedia(@PathVariable Long id) {
     mediaService.deleteMedia(id);

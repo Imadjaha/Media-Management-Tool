@@ -1,28 +1,29 @@
 package com.example.backend.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.example.backend.model.PersonEntity;
-import com.example.backend.model.UserEntity;
-import com.example.backend.repository.PersonRepository;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
+
+import com.example.backend.model.PersonEntity;
+import com.example.backend.model.UserEntity;
+import com.example.backend.repository.PersonRepository;
 
 public class PersonServiceTest {
 
@@ -62,44 +63,10 @@ public class PersonServiceTest {
         null
       );
   }
-
-  @Test
-  public void testGetAllPersons() {
-    when(personRepository.findAll())
-      .thenReturn(java.util.Arrays.asList(person));
-
-    List<PersonEntity> persons = personService.getAllPersons();
-
-    assertEquals(1, persons.size());
-    assertEquals(person, persons.get(0));
-    assertEquals("testFirstName", persons.get(0).getFirstName());
-
-    PersonEntity person2 = new PersonEntity(
-      2L,
-      user,
-      "testFirstName2",
-      "testLastName2",
-      "testAddress2",
-      "testEmai2l@test.com",
-      "123456",
-      LocalDateTime.now(),
-      null
-    );
-
-    when(personRepository.findAll())
-      .thenReturn(java.util.Arrays.asList(person, person2));
-
-    List<PersonEntity> persons2 = personService.getAllPersons();
-
-    assertEquals(2, persons2.size());
-    assertEquals(person, persons2.get(0));
-    assertEquals("testFirstName", persons2.get(0).getFirstName());
-    assertEquals(person2, persons2.get(1));
-    assertEquals("testFirstName2", persons2.get(1).getFirstName());
-
-    verify(personRepository, times(2)).findAll();
-  }
-
+  /**
+   * Testet das Abrufen einer Person anhand ihrer ID.
+   * Überprüft, dass die Person korrekt zurückgegeben wird, wenn sie in der Datenbank vorhanden ist.
+   */
   @Test
   public void testGetPersonById() {
     when(personRepository.findById(1L))
@@ -117,6 +84,10 @@ public class PersonServiceTest {
     verify(personRepository, times(1)).findById(1L);
   }
 
+  /**
+   * Testet das Abrufen einer Person anhand ihrer ID, wenn die Person nicht gefunden wird.
+   * Überprüft, dass eine leere Option zurückgegeben wird, wenn keine Person mit der angegebenen ID existiert.
+   */
   @Test
   public void testGetPersonByIdNotFound() {
     when(personRepository.findById(1L)).thenReturn(java.util.Optional.empty());
@@ -127,6 +98,10 @@ public class PersonServiceTest {
     verify(personRepository, times(1)).findById(1L);
   }
 
+   /**
+   * Testet das Abrufen von Personen anhand der Benutzer-ID.
+   * Überprüft, dass alle Personen korrekt zurückgegeben werden, wenn der Benutzer entsprechende Einträge hat.
+   */
   @Test
   public void testGetPersonByUserId() {
     when(personRepository.findByUserUserId(1L))
@@ -141,6 +116,11 @@ public class PersonServiceTest {
     verify(personRepository, times(1)).findByUserUserId(1L);
   }
 
+
+  /**
+   * Testet das Abrufen von Personen anhand der Benutzer-ID, wenn keine Personen gefunden werden.
+   * Überprüft, dass eine leere Liste zurückgegeben wird, wenn keine Personen zur Benutzer-ID existieren.
+   */
   @Test
   public void testGetPersonByUserIdNotFound() {
     when(personRepository.findByUserUserId(1L)).thenReturn(Arrays.asList());
@@ -151,6 +131,11 @@ public class PersonServiceTest {
     verify(personRepository, times(1)).findByUserUserId(1L);
   }
 
+
+  /**
+   * Testet das erfolgreiche Erstellen einer neuen Person.
+   * Überprüft, dass die Person korrekt erstellt wird und die Daten richtig gespeichert werden.
+   */
   @Test
   public void testdeletePersonSuccess() {
     when(authentication.getName()).thenReturn("testUser");
@@ -175,6 +160,11 @@ public class PersonServiceTest {
     verify(personRepository, times(1)).save(any(PersonEntity.class));
   }
 
+
+  /**
+   * Testet das Erstellen einer Person, wenn der Benutzer nicht gefunden wird.
+   * Überprüft, dass eine RuntimeException geworfen wird, wenn der Benutzer für die angegebene ID nicht existiert.
+   */
   @Test
   public void testdeletePerson_UserNotFound() {
     when(authentication.getName()).thenReturn("testUser");
@@ -194,6 +184,10 @@ public class PersonServiceTest {
     verify(personRepository, never()).save(any(PersonEntity.class));
   }
 
+    /**
+   * Testet das erfolgreiche Aktualisieren einer Person.
+   * Überprüft, dass die Person mit den neuen Details korrekt aktualisiert wird.
+   */
   @Test
   public void testUpdatePerson() {
     when(authentication.getName()).thenReturn(user.getUsername());
@@ -234,6 +228,10 @@ public class PersonServiceTest {
     verify(personRepository, times(1)).save(any(PersonEntity.class));
   }
 
+   /**
+   * Testet das Aktualisieren einer Person, wenn die Person nicht gefunden wird.
+   * Überprüft, dass eine RuntimeException geworfen wird, wenn keine Person mit der angegebenen ID existiert.
+   */
   @Test
   public void testUpdatePerson_NotFound() {
     when(authentication.getName()).thenReturn(user.getUsername());

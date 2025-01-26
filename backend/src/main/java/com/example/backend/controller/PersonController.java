@@ -21,6 +21,10 @@ import com.example.backend.model.UserEntity;
 import com.example.backend.service.PersonService;
 import com.example.backend.service.UserService;
 
+/**
+ * REST-Controller zur Verwaltung von Personen.
+ * Stellt Möglichkeiten für CRUD-Operationen (Erstellen, Lesen, Aktualisieren, Löschen) zur Verfügung.
+ */
 @RestController
 @RequestMapping("/api/persons")
 public class PersonController {
@@ -30,15 +34,21 @@ public class PersonController {
   @Autowired
   private UserService userService;
 
+  /**
+   * Konstruktor  {@code PersonController}.
+   * 
+   * @param personService Implementierung für die Logik für Person.
+   */
   public PersonController(PersonService personService) {
     this.personService = personService;
   }
 
-  @GetMapping
-  public List<PersonEntity> getAllPersons() {
-    return personService.getAllPersons();
-  }
-
+   /**
+   * Gibt Person anhand ihrer ID zurück.
+   * 
+   * @param id ID der Person.
+   * @return Die Person als {@link ResponseEntity}, falls gefunden, andernfalls 404 Not Found.
+   */
   @GetMapping("/{id}")
   public ResponseEntity<PersonEntity> getPersonById(@PathVariable Long id) {
     return personService
@@ -47,6 +57,12 @@ public class PersonController {
       .orElse(ResponseEntity.notFound().build());
   }
 
+  /**
+   * Gibt alle Personen zurück, die einem Benutzer basierend auf dem Benutzernamen zugeordnet sind.
+   * 
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   * @return Eine Liste von {@link PersonEntity}, die dem Benutzer gehören.
+   */
   @GetMapping("/by-username")
   public List<PersonEntity> getPersonsByUsername(
     Authentication authentication
@@ -55,11 +71,24 @@ public class PersonController {
     return personService.getPersonsByUsername(username);
   }
 
+   /**
+   * Gibt alle Personen zurück, die einem Benutzer anhand der Benutzer-ID zugeordnet sind.
+   * 
+   * @param userId ID des Benutzers.
+   * @return Eine Liste von {@link PersonEntity}, die dem Benutzer gehören.
+   */
   @GetMapping("/user/{userId}")
   public List<PersonEntity> getPersonsByUserId(@PathVariable Long userId) {
     return personService.getPersonsByUserId(userId);
   }
 
+  /**
+   * Erstellt neue Person und verknüpft sie mit dem aktuellen Benutzer.
+   * 
+   * @param person Zu erstellende Person als {@link PersonEntity}.
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   * @return Erstellte Person.
+   */
   @PostMapping
   public PersonEntity createPerson(
     @RequestBody PersonEntity person,
@@ -72,6 +101,14 @@ public class PersonController {
     return personService.createPerson(person, authentication);
   }
 
+   /**
+   * Aktualisiert bestehende Person.
+   * 
+   * @param personId ID der zu aktualisierenden Person.
+   * @param currentPerson Aktualisierte Personendaten als {@link PersonEntity}.
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   * @return Die aktualisierte Person als {@link ResponseEntity}.
+   */
   @PutMapping("/{personId}")
   public ResponseEntity<PersonEntity> updatePerson(
     @PathVariable Long personId,
@@ -91,7 +128,14 @@ public class PersonController {
 
     return ResponseEntity.ok(updatedPerson);
   }
-
+  
+  /**
+   * Löscht Person anhand ihrer ID, falls der Benutzer autorisiert ist.
+   * 
+   * @param id  ID der zu löschenden Person.
+   * @param authentication Authentifizierung des aktuellen Benutzers.
+   * @return Eine leere {@link ResponseEntity} mit dem entsprechenden HTTP-Status.
+   */
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deletePerson(
     @PathVariable Long id,
@@ -107,6 +151,7 @@ public class PersonController {
 
     PersonEntity person = personOptional.get();
 
+    // Prüft, ob der Benutzer berechtigt ist, die Person zu löschen
     if (!person.getUser().getUsername().equals(username)) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }

@@ -37,6 +37,12 @@ import com.example.backend.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 
+
+/**
+ * Integrationstests für den LoanController.
+ * Tests prüfen die Funktionalitäten der Ausleihprozesse für Medien, 
+ * inklusive der Erstellung von Ausleihen und der Anzeige von überfälligen Ausleihen.
+ */
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -58,6 +64,13 @@ public class LoanControllerIntegrationTest {
   @Autowired
   private LoanRepository loanRepository;
 
+   /**
+   * Testet die erfolgreiche Erstellung eines neuen Leihvorgangs.
+   * Neues Benutzer-, Medien- und Personenobjekt wird angelegt
+   * und der Leihvorgang mit einem festgelegten Fälligkeitsdatum durchgeführt.
+   * 
+   * @throws Exception Wenn ein Fehler bei der HTTP-Anfrage auftritt.
+   */
   @Test
   void testCreateLoan() throws Exception {
     String uniqueUsername = "testuser2" + System.currentTimeMillis();
@@ -121,6 +134,13 @@ public class LoanControllerIntegrationTest {
       .andExpect(status().isCreated());
   }
 
+
+  /**
+   * Testet den Fall, dass das angegebene Medium für die Ausleihe nicht gefunden wurde.
+   * Zu erwarten: Eine 404-Fehlermeldung wird zurückgegeben.
+   * 
+   * @throws Exception Wenn ein Fehler bei der HTTP-Anfrage auftritt.
+   */
   @Test
   @WithMockUser(username = "testuser", roles = { "USER" })
   void testCreateLoan_MediaNotFound() throws Exception {
@@ -132,6 +152,12 @@ public class LoanControllerIntegrationTest {
       .andExpect(status().isNotFound());
   }
 
+   /**
+   * Testet den Fall, dass die angegebene Person für den Leihvorgang nicht gefunden wurde.
+   * Zu erwarten: Eine 404-Fehlermeldung wird zurückgegeben.
+   * 
+   * @throws Exception Wenn ein Fehler bei der HTTP-Anfrage auftritt.
+   */
   @Test
   @WithMockUser(username = "testuser", roles = { "USER" })
   void testCreateLoan_PersonNotFound() throws Exception {
@@ -143,6 +169,13 @@ public class LoanControllerIntegrationTest {
       .andExpect(status().isNotFound());
   }
 
+   /**
+   * Testet das Abrufen von überfälligen Ausleihen.
+   * Überfällige Ausleihe erstellt und deren Rückgabe überprüft.
+   * Zu erwarten: Die überfällige Ausleihe wird erfolgreich zurückgegeben.
+   * 
+   * @throws Exception Wenn ein Fehler bei der HTTP-Anfrage auftritt.
+   */
   @Test
   void testGetOverdueLoans() throws Exception {
     String uniqueUsername = "testuser" + System.currentTimeMillis();
@@ -199,6 +232,10 @@ public class LoanControllerIntegrationTest {
       .andExpect(jsonPath("$[0].media.title").value("Test Media"));
   }
 
+  /**
+ * Testet das Abrufen von überfälligen Ausleihen für einen Benutzer, 
+ * wobei ein Datum als Parameter übergeben wird.
+ */
   @Test
   @WithMockUser(username = "testuser", roles = { "USER" })
   void testGetOverdueLoansByUser_withDateParameter() throws Exception {
@@ -257,6 +294,10 @@ public class LoanControllerIntegrationTest {
       .andExpect(jsonPath("$.length()").value(1));
   }
 
+
+/**
+ * Testet das Markieren einer Ausleihe als "zurückgegeben".
+ */
   @Test
   @WithMockUser(username = "testuser", roles = { "USER" })
   void testMarkAsReturned() throws Exception {
@@ -305,12 +346,16 @@ public class LoanControllerIntegrationTest {
       )
       .andExpect(status().isNoContent());
 
+    // Überprüfen, ob das Feld returnedAt gesetzt wurde
     LoanEntity updatedLoan = loanRepository
       .findById(testLoan.getLoanId())
       .orElseThrow();
     assertNotNull(updatedLoan.getReturnedAt());
   }
 
+  /**
+ * Testet das Abrufen aller aktiven Ausleihen eines Benutzers.
+ */
   @Test
   void testGetActiveLoansByUser() throws Exception {
     // Benutzer erstellen
@@ -361,6 +406,7 @@ public class LoanControllerIntegrationTest {
         )
       );
 
+    // Testanfrage senden und Erwartungen prüfen
     mockMvc
       .perform(get("/api/loans/active"))
       .andExpect(status().isOk())
@@ -369,6 +415,10 @@ public class LoanControllerIntegrationTest {
       .andExpect(jsonPath("$[0].media.title").value("Test Media"));
   }
 
+
+/**
+ * Testet das Abrufen aller Ausleihen eines Benutzers.
+ */
   @Test
   @WithMockUser(username = "testuser", roles = { "USER" })
   void testGetLoansByUser() throws Exception {
@@ -416,6 +466,7 @@ public class LoanControllerIntegrationTest {
         )
       );
 
+    // Testanfrage senden und Erwartungen prüfen
     mockMvc
       .perform(get("/api/loans/all"))
       .andExpect(status().isOk())
@@ -425,6 +476,9 @@ public class LoanControllerIntegrationTest {
       .andExpect(jsonPath("$[0].media.title").value("Test Media"));
   }
 
+  /**
+ * Testet das Abrufen aller Ausleihen eines Benutzers, wenn der Benutzer nicht autorisiert ist.
+ */
   @Test
   void testGetLoansByUser_Unauthorized() throws Exception {
     mockMvc.perform(get("/api/loans/all")).andExpect(status().isUnauthorized());

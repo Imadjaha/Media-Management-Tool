@@ -69,6 +69,10 @@ public class LoanServiceWriteTests {
     SecurityContextHolder.setContext(context);
   }
 
+  /**
+   * Testet die erfolgreiche Erstellung eines Leihvorgangs.
+   * Überprüft, ob der Leihvorgang korrekt erstellt wird, wenn alle Eingabewerte gültig sind.
+   */
   @Test
   void testCreateLoan_shouldCreateLoanSuccessfully() {
     String username = "testuser";
@@ -117,6 +121,10 @@ public class LoanServiceWriteTests {
     verify(mediaRepository).save(any(MediaEntity.class));
   }
 
+   /**
+   * Testet, dass beim Erstellen eines Leihvorgangs, wenn keine Werte für 'borrowedAt' und 'dueDate'
+   * angegeben sind, Standardwerte gesetzt werden.
+   */
   @Test
   void testCreateLoan_whenBorrowedAtAndDueDateAreNull_shouldSetDefaultValues() {
     // Arrange
@@ -171,6 +179,10 @@ public class LoanServiceWriteTests {
     verify(mediaRepository).save(any(MediaEntity.class));
   }
 
+
+  /**
+   * Testet, dass eine 'UserNotFoundException' geworfen wird, wenn der Benutzer nicht gefunden wird.
+   */
   @Test
   void testCreateLoan_whenUserNotFound_shouldThrowUserNotFoundException() {
     when(userService.getUserByUsername("testuser"))
@@ -189,6 +201,10 @@ public class LoanServiceWriteTests {
     );
   }
 
+
+  /**
+   * Testet, dass eine 'MediaNotFoundException' geworfen wird, wenn das Medium nicht gefunden wird.
+   */
   @Test
   void testCreateLoan_whenMediaNotFound_shouldThrowMediaNotFoundException() {
     // Arrange
@@ -213,6 +229,9 @@ public class LoanServiceWriteTests {
     );
   }
 
+  /**
+   * Testet, dass eine Ausnahme geworfen wird, wenn das Medium bereits ausgeliehen oder nicht verfügbar ist.
+   */
   @Test
   void testCreateLoan_whenMediaIsBorrowedOrUnavailable_shouldThrowRuntimeException() {
     String username = "testuser";
@@ -255,6 +274,9 @@ public class LoanServiceWriteTests {
     verifyNoInteractions(personService);
   }
 
+   /**
+   * Testet, dass eine 'PersonNotFoundException' geworfen wird, wenn die Person nicht gefunden wird.
+   */
   @Test
   void testCreateLoan_whenPersonNotFound_shouldThrowPersonNotFoundException() {
     String username = "testuser";
@@ -283,6 +305,10 @@ public class LoanServiceWriteTests {
     );
   }
 
+
+  /**
+   * Testet das Markieren eines Leihvorgangs als zurückgegeben und die Aktualisierung des Medienstatus.
+   */
   @Test
   void testMarkAsReturned_shouldUpdateLoanAndMediaState() {
     LoanEntity loanEntity = new LoanEntity();
@@ -312,6 +338,10 @@ public class LoanServiceWriteTests {
     verify(mediaRepository).save(mediaEntity);
   }
 
+    /**
+   * Testet, dass eine Ausnahme geworfen wird, wenn der Leihvorgang bereits zurückgegeben wurde.
+   * Überprüft, dass eine RuntimeException mit der erwarteten Fehlermeldung geworfen wird.
+   */
   @Test
   void testMarkAsReturned_whenLoanAlreadyReturned_shouldThrowException() {
     // Arrange
@@ -331,6 +361,11 @@ public class LoanServiceWriteTests {
     verify(loanRepository, never()).save(any());
   }
 
+
+  /**
+   * Testet, dass eine Ausnahme geworfen wird, wenn das Rückgabedatum vor dem Ausleihdatum liegt.
+   * Überprüft, dass eine IllegalArgumentException mit der erwarteten Fehlermeldung geworfen wird.
+   */
   @Test
   void testMarkAsReturned_whenReturnedDateBeforeBorrowedDate_shouldThrowException() {
     // Arrange
@@ -355,6 +390,10 @@ public class LoanServiceWriteTests {
     verify(loanRepository, never()).save(any());
   }
 
+    /**
+   * Testet, dass eine Ausnahme geworfen wird, wenn die Leih-ID null ist.
+   * Überprüft, dass eine IllegalArgumentException mit der entsprechenden Fehlermeldung geworfen wird.
+   */
   @Test
   void testMarkAsReturned_whenLoanIdNull_shouldThrowException() {
     IllegalArgumentException exception = assertThrows(
@@ -365,6 +404,10 @@ public class LoanServiceWriteTests {
     verifyNoInteractions(loanRepository, mediaRepository);
   }
 
+    /**
+   * Testet, dass eine Ausnahme geworfen wird, wenn das Ausleihdatum für einen Leihvorgang nicht gesetzt ist.
+   * Überprüft, dass eine RuntimeException mit der entsprechenden Fehlermeldung geworfen wird.
+   */
   @Test
   void testMarkAsReturned_whenBorrowedAtIsNull_shouldThrowException() {
     // Arrange
@@ -385,6 +428,10 @@ public class LoanServiceWriteTests {
     );
   }
 
+  /**
+   * Testet, dass das Rückgabedatum auf den aktuellen Zeitpunkt gesetzt wird, wenn es null ist.
+   * Überprüft, dass das Rückgabedatum korrekt gesetzt und der Medienstatus auf "VERFÜGBAR" aktualisiert wird.
+   */
   @Test
   void testMarkAsReturned_whenReturnedAtIsNull_shouldSetToNow() {
     LoanEntity loanEntity = new LoanEntity();

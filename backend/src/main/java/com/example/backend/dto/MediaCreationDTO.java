@@ -7,6 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object, zur Erstellung eines Mediums.
+ * Enthält erforderliche Informationen, um ein neues Medium zu erstellen.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,5 +25,7 @@ public class MediaCreationDTO {
   private String isbn;
   private Boolean isFavorite;
   private LocalDateTime createdAt;
+  
+  /** Eine Liste von Kategorien, die dem Medium zugeordnet sind. */
   private List<Long> categories = new ArrayList<>();
 }

@@ -57,6 +57,10 @@ class MediaServiceTest {
     MockitoAnnotations.openMocks(this);
   }
 
+    /**
+   * Testet den Erfolg des Abrufens aller Medien mit Kategorien für einen bestimmten Benutzer.
+   * Überprüft, dass die Medien korrekt abgerufen werden, wenn der Benutzer vorhanden ist.
+   */
   @Test
   void testGetAllMediaByUsernameWithCategories_Success() {
     String username = "testUser";
@@ -82,6 +86,10 @@ class MediaServiceTest {
     verify(mediaRepository, times(1)).findMediaWithCategoriesByUserId(123L);
   }
 
+  /**
+   * Testet, dass eine Ausnahme geworfen wird, wenn der Benutzer für die angegebene ID nicht gefunden wird.
+   * Überprüft, dass eine RuntimeException geworfen wird, wenn der Benutzer nicht existiert.
+   */
   @Test
   void testSeedMedia_UserNotFound_ShouldThrowRuntimeException() {
     when(userService.getUserByUsername("12345")).thenReturn(Optional.empty());
@@ -89,6 +97,10 @@ class MediaServiceTest {
     assertThrows(RuntimeException.class, () -> mediaService.seedMedia(10));
   }
 
+   /**
+   * Testet die erfolgreiche Erstellung eines neuen Mediums.
+   * Überprüft, ob das Medium korrekt erstellt wird und die zugehörigen Kategorien gesetzt sind.
+   */
   @Test
   void testCreateMedia_Success() {
     String username = "testUser";
@@ -134,7 +146,11 @@ class MediaServiceTest {
     assertEquals(1, result.getCategories().size());
     verify(mediaRepository, times(1)).save(any(MediaEntity.class));
   }
-
+  
+  /**
+   * Testet das erfolgreiche Update eines Mediums.
+   * Überprüft, dass die Änderungen am Medium korrekt gespeichert werden.
+   */
   @Test
   void testUpdateMedia_Success() {
     String username = "testUser";
@@ -168,6 +184,10 @@ class MediaServiceTest {
     verify(mediaRepository, times(1)).save(existingMedia);
   }
 
+   /**
+   * Testet das erfolgreiche Zuordnen einer Kategorie zu einem Medium.
+   * Überprüft, dass das Medium korrekt mit der Kategorie verknüpft wird.
+   */
   @Test
   void testAssignCategoryToMedia_Success() {
     String username = "testUser";
@@ -201,6 +221,11 @@ class MediaServiceTest {
     verify(mediaCategoryRepository, times(1)).save(any(MediaCategory.class));
   }
 
+
+  /**
+   * Testet das erfolgreiche Entfernen einer Kategorie von einem Medium.
+   * Überprüft, dass die Kategorie korrekt aus dem Medium entfernt wird.
+   */
   @Test
   void testRemoveCategoryFromMedia_Success() {
     String username = "testUser";
@@ -233,6 +258,10 @@ class MediaServiceTest {
     verify(mediaCategoryRepository, times(1)).delete(mediaCategory);
   }
 
+  /**
+   * Testet das erfolgreiche Löschen eines Mediums.
+   * Überprüft, dass das Medium aus der Datenbank gelöscht wird.
+   */
   @Test
   void testDeleteMedia_Success() {
     Long mediaId = 999L;

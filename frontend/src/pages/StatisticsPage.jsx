@@ -35,14 +35,14 @@ export default function StatisticsPage() {
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 flex-1 overflow-auto relative z-10">
-      <Header title={"Statistics"} />
+      <Header title={"Statistics Page"} />
 
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-1 lg:px-8">
         <Box
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          className="bg-gray-100 dark:bg-gray-900"
+          className="bg-white dark:bg-gray-900"
           sx={{
             display: "flex",
             alignItems: "center",
@@ -50,7 +50,7 @@ export default function StatisticsPage() {
             width: "100%",
             maxWidth: 1200,
             mx: "auto",
-            backgroundColor: "bg-gray-100 dark:bg-gray-900",
+            backgroundColor: "white",
           }}
         >
           <Button
@@ -178,7 +178,7 @@ export default function StatisticsPage() {
           </Box>
         ) : (
           <Box
-            className="grid grid-cols-1 lg:grid-cols-2 gap-8 overflow-x-auto bg-gray-100 dark:bg-gray-900"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8 overflow-x-auto bg-white dark:bg-gray-900"
             sx={{
               backgroundColor: theme.palette.background.default,
               color: theme.palette.text.primary,

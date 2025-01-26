@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object zur Repräsentation von Benutzerdaten für die Registrierung.
+ * Enthält Informationen, welche für die Erstellung eines neuen Benutzers benötigt werden.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

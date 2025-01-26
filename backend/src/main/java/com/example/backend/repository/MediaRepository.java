@@ -12,8 +12,23 @@ import com.example.backend.model.MediaEntity;
 import com.example.backend.model.MediaState;
 import com.example.backend.model.MediaType;
 
+/**
+ * Repository zur Verwaltung der {@link MediaEntity}-Daten.
+ * Ermöglicht Zugriff auf die {@link MediaEntity}-Datenbanktabelle und stellt
+ * verschiedene Methoden zum Abrufen von Medienobjekten anahnd unterschiedlichen
+ * Kriterien, inklusive ihrer Verknüpfungen mit Kategorien.
+ */
 @Repository
 public interface MediaRepository extends JpaRepository<MediaEntity, Long> {
+
+  /**
+   * Findet Liste von Medien mit ihren zugehörigen Kategorien für einen bestimmten Benutzer.
+   * Verwendet eine benutzerdefinierte SQL-Abfrage, um die Medien zusammen mit einer durch 
+   * Kommas getrennten Liste von Kategorien zurückzugeben.
+   * @param userId ID des Benutzers, dessen Medien und Kategorien abgerufen werden sollen.
+   * @return Eine Liste von {@link MediaWithCategoriesProjection}, die Medien mit den zugehörigen Kategorien 
+   * für den angegebenen Benutzer repräsentieren.
+   */
   @Query(
     value = """
     SELECT 
@@ -44,9 +59,39 @@ public interface MediaRepository extends JpaRepository<MediaEntity, Long> {
     Long userId
   );
 
+  /**
+   * Findet alle Medien eines bestimmten Benutzers anhand der Benutzer-ID.
+   * 
+   * @param userId ID des Benutzers, dessen Medien abgerufen werden sollen.
+   * @return Eine Liste von {@link MediaEntity} Objekten, die den angegebenen Benutzer repräsentieren.
+   */
   List<MediaEntity> findByUserUserId(Long userId);
+
+  /**
+   * Findet alle Medien, die einem bestimmten {@link MediaState} zugeordnet sind.
+   * @param mediaState Medienstatus, nach dem gesucht werden soll.
+   * @return Eine Liste von {@link MediaEntity} Objekten, die den angegebenen Status haben.
+   */
   List<MediaEntity> findByMediaState(MediaState mediaState);
+
+   /**
+   * Findet alle Medien, die einem bestimmten {@link MediaType} zugeordnet sind.
+   * @param type Medientyp, nach dem gesucht werden soll.
+   * @return Eine Liste von {@link MediaEntity} Objekten, die den angegebenen Typ haben.
+   */
   List<MediaEntity> findByType(MediaType type);
+
+  /**
+   * Findet alle Medien, die als Favoriten markiert sind.
+   * @param isFavorite Wert, der angibt, ob das Medium als Favorit markiert ist oder nicht.
+   * @return Eine Liste von {@link MediaEntity} Objekten, die den angegebenen Favoritenstatus haben.
+   */
   List<MediaEntity> findByIsFavorite(Boolean isFavorite);
+
+  /**
+   * Findet ein Medium anhand seiner ISBN-Nummer.
+   * @param isbn ISBN des Mediums, nach dem gesucht werden soll.
+   * @return Ein {@link Optional} mit dem gefundenen {@link MediaEntity}-Objekt, falls es existieren sollte.
+   */
   Optional<MediaEntity> findByIsbn(String isbn);
 }

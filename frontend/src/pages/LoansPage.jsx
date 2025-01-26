@@ -32,7 +32,7 @@ const LoansPage = () => {
   }, [dispatch]);
 
   return (
-    <div className="bg-white dark:bg-gray-900 flex-1 overflow-auto relative z-10">
+    <div className="bg-gray-100 dark:bg-gray-900 flex-1 overflow-auto relative z-10">
       <Header title="Loan Page" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
