@@ -13,11 +13,7 @@
       padding: 4px;
       border-radius: 4px;
     }
-    pre {
-      padding: 10px;
-      border-left: 4px solid #0056b3;
-      overflow-x: auto;
-    }
+   
     ul {
       margin: 10px 0;
       padding: 0 20px;
