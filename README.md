@@ -1,27 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-    }
-    h1, h2, h3 {
-      color: #0056b3;
-    }
-    code {
-      padding: 4px;
-      border-radius: 4px;
-    }
-   
-    ul {
-      margin: 10px 0;
-      padding: 0 20px;
-    }
-    a {
-      color: #0056b3;
-    }
-  </style>
+ 
 </head>
 <body>
   <h1>Media Management Tool</h1>
